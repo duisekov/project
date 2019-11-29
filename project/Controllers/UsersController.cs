@@ -15,13 +15,13 @@ namespace project.Controllers
         private readonly AppDBContext _context;
         public bool CheckLoginExists(string login)
         {
-            return login != "danabek";
+            return login == "danabek";
         }
 
         [AcceptVerbs("GET", "POST")]
         public IActionResult VerifyLogin(string login)
         {
-            return Json(CheckLoginExists(login) ? "true" : string.Format("an account for login {0} already exists.", login));
+            return Json(CheckLoginExists(login) ? "false" : string.Format("an account for login {0} already exists.", login));
         }
 
         public UsersController(AppDBContext context)
