@@ -10,6 +10,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using project.Data;
+using project.IInterfaces;
+using project.Repositories;
+using project.Services;
 
 namespace project
 {
@@ -30,6 +33,8 @@ namespace project
                 options.UseSqlite("Filename=data.db");
             });
             services.AddControllersWithViews();
+            services.AddScoped<UserService>();
+            services.AddScoped<IUserRepository, UserRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -7,32 +7,37 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using project.Data;
 using project.Models;
+using project.Services;
 
 namespace project.Controllers
 {
     public class UsersController : Controller
     {
+        private readonly UserService _userService;
+
         private readonly AppDBContext _context;
         public bool CheckLoginExists(string login)
         {
-            return login == "danabek";
+            return login != "danabek";
         }
 
         [AcceptVerbs("GET", "POST")]
         public IActionResult VerifyLogin(string login)
         {
-            return Json(CheckLoginExists(login) ? "false" : string.Format("an account for login {0} already exists.", login));
+            return Json(CheckLoginExists(login) ? "true" : string.Format("an account for login {0} already exists.", login));
         }
 
-        public UsersController(AppDBContext context)
+        public UsersController(AppDBContext context, UserService userService)
         {
             _context = context;
+            _userService = userService;
         }
 
         // GET: Users
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Users.ToListAsync());
+            var users = await _userService.GetUsers();
+            return View(users);
         }
 
         // GET: Users/Details/5
@@ -158,6 +163,29 @@ namespace project.Controllers
         private bool UserExists(int id)
         {
             return _context.Users.Any(e => e.UserId == id);
+        }
+
+        [HttpGet]
+        public IActionResult Add()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Add(User user)
+        {
+
+            await _userService.AddAndSave(user);
+
+            var users = await _userService.GetUsers();
+
+            return View("Index", users);
+        }
+
+        public async Task<IActionResult> Search(string text)
+        {
+            var searchedUsers = await _userService.Search(text);
+            return View("Index", searchedUsers);
         }
     }
 }
